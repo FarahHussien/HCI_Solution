@@ -7,8 +7,8 @@ test_signal = 'D:\Materials FCIS\Year 4\Semester 8\HCI\HCI_Solution\Data\Test si
 x_01, y_01= _import_.reader.read_ecg_data(ali_signal)
 x_02, y_02= _import_.reader.read_ecg_data(mohamed_signal)
 
-filtered_signal_01 = _import_.reader.butter_bandpass_filter(y_01,low_cutoff=0.5,high_cutoff=40,fs=250,order=2)
-filtered_signal_02 = _import_.reader.butter_bandpass_filter(y_02,low_cutoff=0.5,high_cutoff=40,fs=250,order=2)
+filtered_signal_01 = _import_.reader.butter_bandpass_filter(y_01,low_cutoff=1,high_cutoff=40,fs=250,order=2)
+filtered_signal_02 = _import_.reader.butter_bandpass_filter(y_02,low_cutoff=1,high_cutoff=40,fs=250,order=2)
 
 # derivative_02, dy_02 = _import_.reader.apply_derivative(x_02, filtered_signal_02)
 # result = [dy_02[i]**2 for i in range(len(dy_02))] # square el signal
@@ -28,10 +28,10 @@ peaks_01, _ = _import_.find_peaks(filtered_signal_01) # find all peaks in signal
 X, Y = [] , []
 for i in range(len(peaks_01)-1):
     L = peaks_01[i]
-    Y.append(filtered_signal_01[L])
     X.append(filtered_signal_01[i])
+    Y.append(filtered_signal_01[L])
 
-peak_value_01 = max(Y)  # Highest amplitude peak
+peak_value_01 = max(Y)
 
 threshold = 0.6 * peak_value_01
 R_peaks_01, X_Rpos_01 = [] , []
@@ -66,7 +66,6 @@ for r_pos in X_Rpos_01:
 # identify T-peaks
 T_peaks_01, X_Tpos_01 = [] , []
 
-# Look forward around 300ms (75 samples) after each R peak
 lookahead_start = int(0.15 * 250)  # 150ms
 lookahead_end = int(0.3 * 250)     # 300ms
 
@@ -111,7 +110,7 @@ for i in range(len(peaks_02)-1):
     Y.append(filtered_signal_02[L])
     X.append(filtered_signal_02[i])
 
-peak_value_02 = max(Y)  # Highest amplitude peak
+peak_value_02 = max(Y)  
 
 threshold = 0.6 * peak_value_02
 R_peaks_02, X_Rpos_02 = [] , []
@@ -186,7 +185,14 @@ _import_.plt.show()
 dwt_coeffs_01, filtered_01 = _import_.reader.extract_dwt_features(y_01)
 dwt_coeffs_02, filtered_02 = _import_.reader.extract_dwt_features(y_02)
 
-# print("dwt_coeffs_01: ", dwt_coeffs_01[0])
+# filtered_01 = _import_.reader.extract_dwt_features(y_01)
+# filtered_02 = _import_.reader.extract_dwt_features(y_02)
+
+print("dwt_coeffs_01: ", dwt_coeffs_01[0])
+print("filtered_01: ", filtered_01[0])
+print("dwt_coeffs_02: ", dwt_coeffs_02[0])
+print("filtered_02: ", filtered_02[0])
+
 # print(filtered_01[:5])
 # print("dwt_coeffs_02: ", dwt_coeffs_02[0])
 
@@ -198,8 +204,10 @@ dct_coeffs_02 = _import_.reader.extract_ac_dct_features(x_02)
 # print(dct_coeffs_02[:5])
 
 # extract ECG features - ali's sig - mohammed's sig
-ali_features = _import_.reader.extract_ecg_features(P_peaks_01, X_Ppos_01, R_peaks_01, X_Rpos_01, T_peaks_01, X_Tpos_01, dct_coeffs_01[:], filtered_01[:])
-mohamed_features = _import_.reader.extract_ecg_features(P_peaks_02, X_Ppos_02, R_peaks_02, X_Rpos_02, T_peaks_02, X_Tpos_02, dct_coeffs_02[:], filtered_02[:])
+# ali_features = _import_.reader.extract_ecg_features(P_peaks_01, X_Ppos_01, R_peaks_01, X_Rpos_01, T_peaks_01, X_Tpos_01, dct_coeffs_01[:], filtered_01[:])
+# mohamed_features = _import_.reader.extract_ecg_features(P_peaks_02, X_Ppos_02, R_peaks_02, X_Rpos_02, T_peaks_02, X_Tpos_02, dct_coeffs_02[:], filtered_02[:])
+ali_features = _import_.reader.extract_ecg_features(P_peaks_01, X_Ppos_01, R_peaks_01, X_Rpos_01, T_peaks_01, X_Tpos_01, dct_coeffs_01[:], dwt_coeffs_01[0])
+mohamed_features = _import_.reader.extract_ecg_features(P_peaks_02, X_Ppos_02, R_peaks_02, X_Rpos_02, T_peaks_02, X_Tpos_02, dct_coeffs_02[:], dwt_coeffs_02[0])
 
 ali_features.to_csv("D:\Materials FCIS\Year 4\Semester 8\HCI\HCI_Solution\Features Map\Ali_feature_map.csv", index=False)
 mohamed_features.to_csv("D:\Materials FCIS\Year 4\Semester 8\HCI\HCI_Solution\Features Map\Mohamed_feature_map.csv", index=False)

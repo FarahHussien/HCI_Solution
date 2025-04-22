@@ -17,8 +17,6 @@ def read_ecg_data(file_path):
         if len(parts) >= 2:
             ecgX.append(int(parts[0]))
             ecgY.append(int(parts[1]))
-        else:
-            print(f"Warning: Line '{line.strip()}' doesn't contain enough data")
     
     return ecgX, ecgY
 
@@ -88,7 +86,7 @@ def extract_ecg_features(P_peaks, X_Ppos, R_peaks, X_Rpos, T_peaks, X_Tpos, dct,
 
 def extract_dwt_features(signal, wavelet='db1', level=4):
     coeffs = _import_.wt.wavedec(signal, wavelet, level=level)
-    filtered = _import_.wt.waverec([coeffs[0],coeffs[1],coeffs[2]], wavelet)
+    filtered = _import_.wt.waverec([coeffs[0],coeffs[1],coeffs[2]], wavelet) #inverse
     
     return coeffs, filtered
 
